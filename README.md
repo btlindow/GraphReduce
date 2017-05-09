@@ -8,7 +8,7 @@ The input file is required to contain edge descriptions of integers with no blan
 
 ## Authors
 
-* **Ben Lindow** - *Initial work* - [PurpleBooth](https://github.com/btlindow)
+* **Ben Lindow** - *Initial work* - [btlindow](https://github.com/btlindow)
 
 ## Closing
 
