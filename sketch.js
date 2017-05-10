@@ -12,6 +12,8 @@ var l_flag = false;
 var r;
 var b_flag = false;
 var r_count = 0;
+var g_index = [];
+var sub_clique = [];
 
 function setup() {
 	canvas = createCanvas(winX, winY);
@@ -108,6 +110,10 @@ function process() {
 			checkSubCliquePotential();
 			break;
 		case 7:
+			npCliqueSearch();
+			step++;
+			break;
+		case 8:
 			showReductionStats();
 			step++;
 			break;
@@ -284,6 +290,93 @@ function showReductionStats() {
 	console.log("Reduction By Percentage: " + per + "%");
 }
 
+//Find Sub-Clique of Remaining Nodes
+function npCliqueSearch() {
+	//Index the Left Nodes
+	for(var i = 0; i < g_node.length; i++) {
+		if(g_node[i] != null && g_node[i].side == 0) {
+			g_index.push(i);
+		}
+	}
+
+	//Find A Sequence with max_degree +1 Nodes
+	for(var i = 0; i < 2^(g_index.length); i++) {
+		var bin = (i >>> 0).toString(2);
+		var count = (bin.split("1").length - 1);
+		if(count == (max_degree + 1)) {
+			for (var j = 0; j < bin.length; j++) {
+				if(bin[j] == '1') {
+					var node = g_node[g_index[j]];
+					sub_clique.push(node);
+				}
+			}
+			
+			if(checkCompleteness()) {
+				colorSubClique();
+				return;
+			}
+
+			sub_clique = [];
+		}
+	}
+	startOver();
+}
+
+//Check If The sub_clique is Complete
+function checkCompleteness() {
+	for(var i = 0; i < sub_clique.length; i++) {
+		for(var j = i+1; j < sub_clique.length; j++) {
+			if(!isAdjacent(sub_clique[i], sub_clique[j])) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+//Determines if nodeA is in nodeB's Adjacency List
+function isAdjacent(nodeA, nodeB) {
+	for(var i = 0; i < nodeB.adjacent.length; i++) {
+		if(nodeA == nodeB.adjacent[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+//Color the SubClique
+function colorSubClique() {
+	for(var i = 0; i < sub_clique.length; i++) {
+		sub_clique[i].color = color("magenta");
+	}
+
+	for(var i = 0; i < g_edge.length; i++) {
+		if(edgeInClique(g_edge[i])) {
+			g_edge[i].color = color("magenta");
+		}
+	}
+
+}
+
+//Determines if an edge is in the clique
+function edgeInClique(edge) {
+	nodeA = edge.left;
+	nodeB = edge.right;
+	if(nodeInClique(nodeA) && nodeInClique(nodeB)) {
+		return true;
+	}
+	return false;
+}
+
+function nodeInClique(node) {
+	for (var i = 0; i < sub_clique.length; i++) {
+		if (node == sub_clique[i]){
+			return true;
+		}
+	}
+	return false;
+}
+
 //Step By Clicking Mouse
 // function mouseClicked() {
 // 	if(l_flag) {
@@ -318,5 +411,3 @@ function displayBarrier() {
 		pop();
 	}
 }
-
-
