@@ -1,7 +1,7 @@
 function GraphEdge(nodeA, nodeB) {
 	this.left = nodeA;
 	this.right = nodeB;
-	this.thickness = 1;
+	this.thickness = 3;
 	this.color = "black";
 
 	this.show = function() {
