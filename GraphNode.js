@@ -1,7 +1,7 @@
 function GraphNode(name) {
 	this.name = name;
 	this.degree = 0;
-	this.r = 5;
+	this.r = 15;
 	this.pos = createVector(random(this.r*2,(winX-this.r*5)), 
 							random(this.r*2,(winY-this.r*5)));
 	this.color = "black";

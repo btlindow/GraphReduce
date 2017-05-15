@@ -14,6 +14,7 @@ var b_flag = false;
 var r_count = 0;
 var g_index = [];
 var sub_clique = [];
+var follower = null;
 
 function setup() {
 	canvas = createCanvas(winX, winY);
@@ -65,7 +66,6 @@ function fileSelected(file) {
 		g_edge.push(edge);
 	}
 	l_flag = true;
-	step = 0;
 }
 
 function draw() {
@@ -73,6 +73,8 @@ function draw() {
 	displayGraphNodes();
 	displayGraphEdges();
 	displayBarrier();
+	moveNode();
+	followNode();
 	process();
 }
 
@@ -82,40 +84,40 @@ function process() {
 		case 0:
 			getMaxDegree();
 			console.log("Overall Max Degree: " + max_degree);
-			step++;
+			step = -1;
 			break;
 		case 1:
 			getPotentialDegree();
 			console.log("Potentail Sub-Clique Degree: " + max_degree);
-			step++;
+			step = -1;
 			break;
 		case 2:
 			identifyNodes();
-			step++;
+			step = -1;
 			break;
 		case 3:
 			separateNodes();
-			step++;
+			step = -1;
 			break;
 		case 4:
 			identifyEdges();
-			step++;
+			step = -1;
 			break;
 		case 5:
 			updateNodes();
 			identifyEdges();
-			step++;
+			step = -1;
 			break;
 		case 6:
 			checkSubCliquePotential();
 			break;
 		case 7:
 			npCliqueSearch();
-			step++;
+			step = -1;
 			break;
 		case 8:
 			showReductionStats();
-			step++;
+			step = -1;
 			break;
 		default:
 			break;
@@ -245,7 +247,7 @@ function checkSubCliquePotential() {
 		startOver();
 		r_count++;
 	} else {
-		step++;
+		step = -1;
 	}
 }
 
@@ -265,7 +267,8 @@ function startOver() {
 	for(var i = 0; i < num_edges; i++) {
 		g_edge[i].color = "black";
 	}
-	step = 1;
+	step = -1;
+	m_step = 1;
 }
 
 //Show Stats About the Reduction
@@ -377,13 +380,41 @@ function nodeInClique(node) {
 	return false;
 }
 
-//Step By Clicking Mouse
-// function mouseClicked() {
-// 	if(l_flag) {
-// 		step = m_step;
-// 		m_step++;
-// 	}
-// }
+//Step By Pressing Key
+function keyPressed() {
+	if(l_flag) {
+		step = m_step;
+		m_step++;
+	}
+}
+
+//Find Node to Move When Clicked
+function moveNode() {
+	if(mouseIsPressed) {
+		for(var i = 0; i < g_node.length; i++) {
+			if(g_node[i] != null) {
+				var d = dist(mouseX, mouseY, g_node[i].pos.x, g_node[i].pos.y);
+				if(d < r && follower == null) {
+					follower = g_node[i];
+				}
+			}
+		}
+	}
+}
+
+//Move Node
+function followNode() {
+	if(follower == null) {
+		return
+	}
+	if (!mouseIsPressed) {
+		follower = null;
+	}
+	else {
+		follower.pos.x = mouseX;
+		follower.pos.y = mouseY;
+	}
+}
 
 //Display Nodes
 function displayGraphNodes() {
